@@ -43,24 +43,6 @@ defmodule Script do
     {istart, ilen}
   end
 
-  def invert(range, inter) do
-    {start, len} = range
-    {istart, ilen} = inter
-    if istart == start && ilen == len do
-      []
-    else
-      if istart > start && istart+ilen < start+len do
-        [{start, istart-start}, {istart+ilen, abs(istart+ilen - (start+len))}]
-      else
-        if istart == start do
-          [{istart+ilen, abs(istart+ilen - (start+len))}]
-        else
-          [{start, istart-start}]
-        end
-      end
-    end
-  end
-
   def combine_ranges(start, len, ranges) do
     intersections = ranges
                     |> Enum.map(fn {xstart, ystart, rlen} -> 
@@ -138,7 +120,6 @@ defmodule Script do
           |> Enum.map(fn range -> elem(range, 0) end)
           |> Enum.min()
     IO.puts(ans)
-
   end
 end
 
