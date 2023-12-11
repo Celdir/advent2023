@@ -27,5 +27,13 @@ path = "src/10/part1/main.rs"
 name = "10-2"
 path = "src/10/part2/main.rs"
 
+[[bin]]
+name = "11-1"
+path = "src/11/part1/main.rs"
+
+[[bin]]
+name = "11-2"
+path = "src/11/part2/main.rs"
+
 [dependencies]
 cgraph = { path = "../../cgraph" }
