@@ -1,6 +1,5 @@
 #[allow(unused_imports)]
 use std::io::{stdin, stdout, BufRead, BufWriter, Write};
-use std::iter::once;
 
 fn main() {
     let mut sum = 0;
