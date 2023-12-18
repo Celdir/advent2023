@@ -78,10 +78,6 @@ fn area(edges: &[Edge]) -> isize {
         / 2
 }
 
-fn interior(area: isize, boundary: isize) -> isize {
-    area - boundary / 2 + 1
-}
-
 fn main() {
     let edges: Vec<Edge> = stdin()
         .lock()
@@ -96,7 +92,7 @@ fn main() {
 
     let area = area(&edges);
     let boundary: isize = edges.iter().map(|e| e.vector.len).sum();
-    let interior = interior(area, boundary);
+    let interior = area - boundary / 2 + 1;
     let ans = boundary + interior;
     println!("{}", ans);
 }
