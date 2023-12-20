@@ -46,7 +46,7 @@ fn main() {
         .map(|l| l.unwrap().into_bytes())
         .collect();
     let mut builder = GraphBuilder::<(), ()>::new()
-        .adj_list()
+        .adj_flat()
         .directed()
         .ordinal()
         .with_size(grid.len() * grid[0].len() * 4);

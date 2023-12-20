@@ -99,7 +99,7 @@ fn main() {
     let n = grid.len();
     let m = grid[0].len();
     let mut builder = GraphBuilder::<(), u32>::new()
-        .adj_list()
+        .adj_flat()
         .directed()
         .keyed::<State>();
 
