@@ -38,6 +38,7 @@ fn main() {
         .collect();
     let n = grid.len() as isize;
     let m = grid[0].len() as isize;
+    println!("{} {}", n, m);
 
     let mut positions: HashSet<Position> = HashSet::new();
 
@@ -69,48 +70,13 @@ fn main() {
                 adj
             })
             .flatten()
-            .filter(|pos| pos.0 >= -n && pos.0 < 2 * n && pos.1 >= -m && pos.1 < 2 * m)
             .collect();
-        let center = positions
-            .iter()
-            .filter(|pos| pos.0 >= 0 && pos.0 < n && pos.1 >= 0 && pos.1 < m);
-        let left = positions
-            .iter()
-            .filter(|pos| pos.0 >= 0 && pos.0 < n && pos.1 >= -m && pos.1 < 0);
-        let right = positions
-            .iter()
-            .filter(|pos| pos.0 >= 0 && pos.0 < n && pos.1 >= m && pos.1 < 2 * m);
-        let top = positions
-            .iter()
-            .filter(|pos| pos.0 >= -n && pos.0 < 0 && pos.1 >= 0 && pos.1 < m);
-        let bottom = positions
-            .iter()
-            .filter(|pos| pos.0 >= n && pos.0 < 2*n && pos.1 >= 0 && pos.1 < m);
-        let upper_left = positions
-            .iter()
-            .filter(|pos| pos.0 >= -n && pos.0 < 0 && pos.1 >= -m && pos.1 < 0);
-        let upper_right = positions
-            .iter()
-            .filter(|pos| pos.0 >= -n && pos.0 < 0 && pos.1 >= m && pos.1 < 2*m);
-        let lower_left = positions
-            .iter()
-            .filter(|pos| pos.0 >= n && pos.0 < 2*n && pos.1 >= -m && pos.1 < 0);
-        let lower_right = positions
-            .iter()
-            .filter(|pos| pos.0 >= n && pos.0 < 2*n && pos.1 >= m && pos.1 < 2*m);
-        println!(
-            "{} total: {}, center: {}, left: {}, right: {}, top: {}, bottom: {}, upper_left: {}, upper_right: {}, lower_left: {}, lower_right: {}",
-            step,
-            positions.len(),
-            center.count(),
-            left.count(),
-            right.count(),
-            top.count(),
-            bottom.count(),
-            upper_left.count(),
-            upper_right.count(),
-            lower_left.count(),
-            lower_right.count()
-        );
+        println!("{} {}", step, positions.len());
     }
+    // After analysis of input and x and y value outputs, I noticed that after 65 steps the
+    // boundary of the first grid is reached, then every 131 steps the end of another diamond of
+    // grids is reached. Using the y values where x=65, x=65+131, x=65+2*131, etc, I did a
+    // quadratic curve fit resulting in 3648 + 14604 * x + 14529 * x^2 where x is the diamond's
+    // radius (excluding the origin grid) in grid widths. x_ans = (steps - 65 / 131), since steps
+    // is 26501365, x_ans = 202300. Plugging x_ans into the quadratic yields the correct answer.
 }
