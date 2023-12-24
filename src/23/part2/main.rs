@@ -1,11 +1,13 @@
 #[allow(unused_imports)]
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::io::{stdin, BufRead};
 
 use std::ops::Add;
 
 use cgraph::graph::builder::GraphBuilder;
-use cgraph::graph::traits::Graph;
+use cgraph::graph::traits::{DirectedGraph, Graph};
+use cgraph::iter::bfs::bfs;
 
 #[derive(Hash, PartialEq, Eq, Copy, Clone, Debug)]
 enum Direction {
@@ -39,29 +41,27 @@ impl Position {
     }
 }
 
-fn maxdfs<G: Graph<NId = Position, EId = usize>>(
+fn maxdfs<G: Graph<NId = Position, EId = usize, E = isize>>(
     g: &G,
-    memo: &mut HashMap<G::EId, usize>,
-    cur: G::EId,
+    vis: &mut HashSet<G::NId>,
+    cur: Position,
     goal: Position,
-) -> usize {
-    if memo.contains_key(&cur) {
-        return memo[&cur];
+) -> isize {
+    if cur == goal {
+        return 0;
     }
-    let edge = g.edge(cur).unwrap();
-    if edge.v() == goal {
-        memo.insert(cur, 1);
-        return 1;
-    }
-    memo.insert(cur, 0);
-    for (e, neighbor) in g.adj(edge.v()).unwrap() {
-        if neighbor.id() != edge.u() {
-            let branch = 1 + maxdfs(g, memo, e.id(), goal);
-            let entry = memo.get_mut(&cur).unwrap();
-            *entry = std::cmp::max(*entry, branch);
+    vis.insert(cur);
+    let mut max = -1;
+    for (edge, neighbor) in g.adj(cur).unwrap() {
+        if !vis.contains(&neighbor.id()) {
+            let branch = maxdfs(g, vis, neighbor.id(), goal);
+            if branch >= 0 {
+                max = std::cmp::max(max, branch + *edge.data());
+            }
         }
     }
-    return memo[&cur];
+    vis.remove(&cur);
+    return max;
 }
 
 fn main() {
@@ -77,10 +77,6 @@ fn main() {
         .adj_flat()
         .di()
         .keyed::<Position>();
-    let mut prime_builder = GraphBuilder::<(), isize>::new()
-        .adj_flat()
-        .di()
-        .keyed::<Position>();
 
     let mut start = Position(0, 0);
     let mut end = Position(n - 1, 0);
@@ -88,7 +84,6 @@ fn main() {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
             builder = builder.node(Position(i, j), ());
-            prime_builder = prime_builder.node(Position(i, j), ());
         }
     }
     for i in 0..grid.len() {
@@ -122,12 +117,48 @@ fn main() {
 
     let g = builder.build();
 
-    let mut memo = HashMap::new();
-    let ans = maxdfs(
-        &g,
-        &mut memo,
-        g.adj(start).unwrap().next().unwrap().0.id(),
-        end,
-    );
+    let mut prime_builder = GraphBuilder::<(), isize>::new()
+        .adj_flat()
+        .un()
+        .keyed::<Position>();
+    prime_builder = prime_builder.node(start, ());
+    prime_builder = prime_builder.node(end, ());
+    for node in g.nodes() {
+        if g.out_degree(node.id()) > 2 {
+            prime_builder = prime_builder.node(node.id(), ());
+        }
+    }
+    let mut parent: HashMap<Position, (Position, isize)> = HashMap::new();
+    parent.insert(start, (start, 0));
+    parent.insert(end, (end, 0));
+    for (edge_opt, node) in bfs(&g, start) {
+        if let Some(edge) = edge_opt {
+            if g.out_degree(node.id()) > 2 || node.id() == end {
+                parent.insert(node.id(), (node.id(), 0));
+            } else {
+                let other = edge.other(node.id());
+                let (last_junction, dist) = parent[&other];
+                parent.insert(node.id(), (last_junction, dist + 1));
+            }
+        }
+        for (_, neighbor) in g.adj(node.id()).unwrap() {
+            if parent.contains_key(&neighbor.id()) {
+                let (parent_id, dist_parent) = parent[&node.id()];
+                let (neighbor_parent, dist_neighbor_parent) = parent[&neighbor.id()];
+                if parent_id != neighbor_parent {
+                    prime_builder = prime_builder.edge(
+                        parent_id,
+                        neighbor_parent,
+                        dist_parent + dist_neighbor_parent + 1,
+                    );
+                }
+            }
+        }
+    }
+
+    let gprime = prime_builder.build();
+
+    let mut vis = HashSet::new();
+    let ans = maxdfs(&gprime, &mut vis, start, end);
     println!("{}", ans);
 }

@@ -77,10 +77,6 @@ fn main() {
         .adj_flat()
         .di()
         .keyed::<Position>();
-    let mut prime_builder = GraphBuilder::<(), isize>::new()
-        .adj_flat()
-        .di()
-        .keyed::<Position>();
 
     let mut start = Position(0, 0);
     let mut end = Position(n - 1, 0);
@@ -88,7 +84,6 @@ fn main() {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
             builder = builder.node(Position(i, j), ());
-            prime_builder = prime_builder.node(Position(i, j), ());
         }
     }
     for i in 0..grid.len() {
