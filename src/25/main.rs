@@ -14,7 +14,6 @@ fn main() {
     let mut g = GraphBuilder::<(), isize>::new()
         .adj_flat()
         .flow()
-        .ordinal()
         .build();
 
     let mut ids: HashMap<&str, usize> = HashMap::new();
