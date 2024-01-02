@@ -6,7 +6,7 @@ use std::io::{stdin, BufRead};
 use std::ops::Add;
 
 use cgraph::graph::builder::GraphBuilder;
-use cgraph::graph::traits::{DirectedGraph, Graph};
+use cgraph::graph::traits::{DirectedGraph, Graph, GraphIter};
 use cgraph::iter::bfs::bfs;
 
 #[derive(Hash, PartialEq, Eq, Copy, Clone, Debug)]

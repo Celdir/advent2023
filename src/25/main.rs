@@ -5,16 +5,13 @@ use std::io::{stdin, BufRead};
 use cgraph::algo::flow::dinic::dinic;
 use cgraph::graph::builder::GraphBuilder;
 use cgraph::graph::flow::FlowGraph;
-use cgraph::graph::traits::{Graph, OrdinalGraph};
+use cgraph::graph::traits::{GraphIter, OrdinalGraph};
 use cgraph::iter::bfs::bfs_where;
 
 fn main() {
     let input: Vec<String> = stdin().lock().lines().map(|l| l.unwrap()).collect();
 
-    let mut g = GraphBuilder::<(), isize>::new()
-        .adj_flat()
-        .flow()
-        .build();
+    let mut g = GraphBuilder::<(), isize>::new().adj_flat().flow().build();
 
     let mut ids: HashMap<&str, usize> = HashMap::new();
 
